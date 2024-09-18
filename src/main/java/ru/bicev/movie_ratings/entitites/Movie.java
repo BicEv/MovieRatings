@@ -25,7 +25,7 @@ public class Movie {
     @Size(min = 1, max = 50, message = "Title should be from 1 to 50 symbols long")
     private String title;
 
-    @Size(max = 255, message = "Synopsis must be less than 256 symbols")    
+    @Size(max = 255, message = "Synopsis must be less than 256 symbols")
     private String synopsis;
 
     @NotEmpty(message = "Genre cannot be empty")
@@ -41,8 +41,9 @@ public class Movie {
     public Movie() {
     }
 
-    public Movie(String title, String genre, int releaseYear) {
+    public Movie(String title, String synopsis, String genre, int releaseYear) {
         this.title = title;
+        this.synopsis = synopsis;
         this.genre = genre;
         this.releaseYear = releaseYear;
     }
@@ -94,7 +95,5 @@ public class Movie {
     public void setSynopsis(String synopsis) {
         this.synopsis = synopsis;
     }
-
-    
 
 }

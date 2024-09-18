@@ -30,8 +30,7 @@ public class MovieDto {
     public MovieDto() {
     }
 
-    public MovieDto(
-            String title, String synopsis, String genre, int releaseYear) {
+    public MovieDto(String title, String synopsis, String genre, int releaseYear) {
         this.title = title;
         this.synopsis = synopsis;
         this.genre = genre;
