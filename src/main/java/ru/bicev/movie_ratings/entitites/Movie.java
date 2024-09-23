@@ -96,4 +96,6 @@ public class Movie {
         this.synopsis = synopsis;
     }
 
+    
+
 }
