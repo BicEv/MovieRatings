@@ -28,10 +28,10 @@ public class UserService {
 
     @Transactional
     public UserDto createNewUser(UserDto userDto) {
-        if (userExistsByEmail(userDto.getEmail())) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new DuplicateUserException("User with this email already exists.");
         }
-        if (userExistsByUserName(userDto.getUserName())) {
+        if (userRepository.findByUserName(userDto.getUserName()).isPresent()) {
             throw new DuplicateUserException("User with this username already exists.");
         }
 
@@ -79,18 +79,10 @@ public class UserService {
 
     @Transactional
     public void deleteUserById(Long id) {
-        if (!userRepository.existsById(id)) {
+        if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("User with id: " + id + " is not found.");
         }
         userRepository.deleteById(id);
-    }
-
-    private boolean userExistsByEmail(String email) {
-        return userRepository.userExistsByEmail(email);
-    }
-
-    private boolean userExistsByUserName(String userName) {
-        return userRepository.userExistsByUserName(userName);
     }
 
 }

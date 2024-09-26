@@ -10,16 +10,20 @@ import ru.bicev.movie_ratings.entitites.User;
 public class UserConverter {
 
     public static UserDto toDto(User user) {
+        if (user == null) {
+            return null;
+        }
+
         UserDto dto = new UserDto();
-        
+
         dto.setId(user.getId());
         dto.setEmail(user.getEmail());
         dto.setUserName(user.getUserName());
         dto.setRole(user.getRole().name());
 
-        List<Long> reviewIds = user.getReviews().stream()
+        List<Long> reviewIds = (user.getReviews() != null) ? user.getReviews().stream()
                 .map(Review::getId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()) : List.of();
         dto.setReviewIds(reviewIds);
 
         return dto;

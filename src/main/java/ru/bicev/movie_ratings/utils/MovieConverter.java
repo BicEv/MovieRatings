@@ -17,9 +17,9 @@ public class MovieConverter {
         movieDto.setSynopsis(movie.getSynopsis());
         movieDto.setReleaseYear(movie.getReleaseYear());
         movieDto.setGenre(movie.getGenre());
-        List<Long> reviewIds = movie.getReviews().stream()
+        List<Long> reviewIds = (movie.getReviews() != null) ? movie.getReviews().stream()
                 .map(Review::getId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()) : List.of();
         movieDto.setReviewIds(reviewIds);
 
         return movieDto;
@@ -27,7 +27,7 @@ public class MovieConverter {
 
     public static Movie toEntity(MovieDto movieDto) {
         Movie movie = new Movie();
-        
+
         movie.setTitle(movieDto.getTitle());
         movie.setSynopsis(movieDto.getSynopsis());
         movie.setReleaseYear(movieDto.getReleaseYear());
