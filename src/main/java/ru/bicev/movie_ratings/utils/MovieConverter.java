@@ -10,6 +10,10 @@ import ru.bicev.movie_ratings.entitites.Review;
 public class MovieConverter {
 
     public static MovieDto toDto(Movie movie) {
+        if (movie == null) {
+            return null;
+        }
+        
         MovieDto movieDto = new MovieDto();
 
         movieDto.setId(movie.getId());

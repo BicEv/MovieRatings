@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
@@ -152,6 +153,37 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findByEmail(email);
 
         verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    public void changePassword_Success() {
+        UserDto userDto = new UserDto(email, username, password, "USER");
+        User user = new User(email, username, password, Role.USER);
+        String oldPassword = "password";
+        String newPassword = "newpassword";
+
+        when(userRepository.findByEmail(userDto.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(oldPassword, user.getPassword())).thenReturn(true);
+        when(passwordEncoder.encode(newPassword)).thenReturn("encodedNewPassword");
+
+        UserDto changedUserDto = userService.changePassword(userDto, oldPassword, newPassword);
+
+        verify(userRepository, times(1)).save(argThat(u -> u.getPassword().equals("encodedNewPassword")));
+    }
+
+    @Test
+    public void changePassword_throwsException() {
+        UserDto userDto = new UserDto(email, username, "invalidPassword", "USER");
+        User user = new User(email, username, password, Role.USER);
+        String oldPassword = "invalidPassword";
+        String newPassword = "newpassword";
+
+        when(userRepository.findByEmail(userDto.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(oldPassword, user.getPassword())).thenReturn(false);
+
+        assertThrows(ru.bicev.movie_ratings.exceptions.IllegalAccessException.class,
+                () -> userService.changePassword(userDto, oldPassword, newPassword));
+
     }
 
 }
