@@ -8,8 +8,11 @@ import ru.bicev.movie_ratings.entitites.User;
 public class ReviewConverter {
 
     public static ReviewDto toDto(Review review) {
+        if (review == null) {
+            return null;
+        }
         ReviewDto reviewDto = new ReviewDto();
-        
+
         reviewDto.setId(review.getId());
         reviewDto.setComment(review.getComment());
         reviewDto.setRating(review.getRating());
