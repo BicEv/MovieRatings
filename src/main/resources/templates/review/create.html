@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Review</title>
+</head>
+
+<body>
+    <h1>Create New Review</h1>
+    <!-- Форма создания нового отзыва -->
+    <form th:action="@{/reviews}" th:object="${review}" method="post">
+        <!-- Поле ввода для названия фильма -->
+        <label for="movieId">Movie ID:</label>
+        <input type="number" id="movieId" th:field="*{movieId}" placeholder="Enter movie ID" required />
+        <br />
+        <!-- Поле ввода для идентификатора пользователя -->
+        <label for="userId">User ID:</label>
+        <input type="number" id="userId" th:field="*{userId}" placeholder="Enter user ID" required />
+        <br />
+        <!-- Текстовое поле для написания текста отзыва -->
+        <label for="comment">Review Comment:</label>
+        <textarea id="comment" th:field="*{comment}" placeholder="Write your review here" required></textarea>
+        <br />
+        <!-- Поле для оценки фильма (от 1 до 5) -->
+        <label for="rating">Rating:</label>
+        <input type="number" id="rating" th:field="*{rating}" min="1" max="5" placeholder="Rate from 1 to 5" required />
+        <br />
+        <!-- Кнопка для отправки формы -->
+        <button type="submit">Submit Review</button>
+    </form>
+    <!-- Ссылка для возврата к списку всех отзывов -->
+    <a th:href="@{/reviews}">Back to Review List</a>
+</body>
+
+</html>

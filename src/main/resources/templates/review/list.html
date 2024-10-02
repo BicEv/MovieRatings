@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Review List</title>
+</head>
+
+<body>
+    <h1>Review List</h1>
+    <!-- Таблица для отображения списка отзывов -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Movie ID</th>
+                <th>User ID</th>
+                <th>Comment</th>
+                <th>Rating</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Цикл, который проходит по всем отзывам из модели -->
+            <tr th:each="review : ${reviews}">
+                <td th:text="${review.id}"></td>
+                <td th:text="${review.movieId}"></td>
+                <td th:text="${review.userId}"></td>
+                <td th:text="${review.comment}"></td>
+                <td th:text="${review.rating}"></td>
+                <td>
+                    <!-- Кнопки действий для каждого отзыва: Просмотр, Редактирование, Удаление -->
+                    <a th:href="@{/reviews/{id}(id=${review.id})}">View</a> |
+                    <a th:href="@{/reviews/edit(id=${review.id})}">Edit</a> |
+                    <form th:action="@{/reviews/{id}/delete(id=${review.id})}" method="post" style="display:inline">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Ссылка для создания нового отзыва -->
+    <a th:href="@{/reviews/create}">Create New Review</a>
+</body>
+
+</html>

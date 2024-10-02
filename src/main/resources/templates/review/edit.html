@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Review</title>
+</head>
+
+<body>
+    <h1>Edit Review</h1>
+    <!-- Форма редактирования отзыва -->
+    <form th:action="@{/reviews/edit}" th:object="${review}" method="post">
+        <!-- Поле для редактирования идентификатора фильма -->
+        <label for="movieId">Movie ID:</label>
+        <input type="number" id="movieId" th:field="*{movieId}" readonly />
+        <br />
+        <!-- Поле для редактирования идентификатора пользователя -->
+        <label for="userId">User ID:</label>
+        <input type="number" id="userId" th:field="*{userId}" readonly />
+        <br />
+        <!-- Поле для редактирования текста отзыва -->
+        <label for="comment">Review Comment:</label>
+        <textarea id="comment" th:field="*{comment}"></textarea>
+        <br />
+        <!-- Поле для редактирования оценки фильма -->
+        <label for="rating">Rating:</label>
+        <input type="number" id="rating" th:field="*{rating}" min="1" max="10" />
+        <br />
+        <!-- Кнопка для сохранения изменений -->
+        <button type="submit">Save Changes</button>
+    </form>
+    <!-- Ссылка для возврата к списку всех отзывов -->
+    <a th:href="@{/reviews}">Back to Review List</a>
+</body>
+
+</html>

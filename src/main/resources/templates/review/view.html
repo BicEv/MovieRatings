@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Review Details</title>
+</head>
+
+<body>
+    <h1>Review Details</h1>
+    <!-- Отображение подробной информации об отзыве -->
+    <div>
+        <p><strong>Movie ID:</strong> <span th:text="${review.movieId}"></span></p>
+        <p><strong>User ID:</strong> <span th:text="${review.userId}"></span></p>
+        <p><strong>Comment:</strong></p>
+        <p th:text="${review.comment}"></p>
+        <p><strong>Rating:</strong> <span th:text="${review.rating}"></span></p>
+    </div>
+    <!-- Кнопка для редактирования отзыва -->
+    <a th:href="@{/reviews/edit(id=${review.id})}">Edit Review</a> |
+    <!-- Форма для удаления отзыва с использованием метода POST -->
+    <form th:action="@{/reviews/{id}/delete(id=${review.id})}" method="post" style="display:inline">
+        <button type="submit">Delete Review</button>
+    </form>
+    <br />
+    <!-- Ссылка для возврата к списку всех отзывов -->
+    <a th:href="@{/reviews}">Back to Review List</a>
+</body>
+
+</html>
