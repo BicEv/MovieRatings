@@ -39,7 +39,7 @@ public class MovieRestController {
     }
 
     @GetMapping("/title")
-    public ResponseEntity<MovieDto> getMovieByTile(@RequestParam String title) {
+    public ResponseEntity<MovieDto> getMovieByTitle(@RequestParam String title) {
         MovieDto foundMovie = movieService.findMovieByTitle(title);
         return new ResponseEntity<MovieDto>(foundMovie, HttpStatus.OK);
     }
