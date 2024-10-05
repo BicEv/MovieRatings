@@ -1,4 +1,4 @@
-package ru.bicev.movie_ratings;
+package ru.bicev.movie_ratings.ServiceTest;
 
 import java.util.Optional;
 

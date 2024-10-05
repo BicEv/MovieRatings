@@ -1,4 +1,4 @@
-package ru.bicev.movie_ratings;
+package ru.bicev.movie_ratings.RestControllerTest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ru.bicev.movie_ratings.TestSecurityConfig;
 import ru.bicev.movie_ratings.api.MovieRestController;
 import ru.bicev.movie_ratings.dto.MovieDto;
 import ru.bicev.movie_ratings.exceptions.DuplicateMovieException;

@@ -36,7 +36,7 @@ public class MovieController {
     public String createMovie(@Valid @ModelAttribute MovieDto movieDto, Model model) {
         MovieDto createdMovie = movieService.createMovie(movieDto);
         model.addAttribute("movie", createdMovie);
-        return "redirect:/movies" + createdMovie.getId();
+        return "redirect:/movies";
     }
 
     @DeleteMapping("/{id}/delete")
@@ -69,6 +69,6 @@ public class MovieController {
     public String editMovie(@Valid @ModelAttribute MovieDto movieDto, Model model) {
         MovieDto updatedMovie = movieService.updateMovie(movieDto);
         model.addAttribute("movie", updatedMovie);
-        return "redirect:/movies" + updatedMovie.getId();
+        return "redirect:/movies";
     }
 }
