@@ -33,11 +33,11 @@ public class ReviewController {
         return "review/create";
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public String createReview(@Valid @ModelAttribute ReviewDto reviewDto, Model model) {
         ReviewDto createdReview = reviewService.createReview(reviewDto);
         model.addAttribute("review", createdReview);
-        return "redirect:/reviews/" + createdReview.getId();
+        return "redirect:/reviews";
     }
 
     @DeleteMapping("/{id}/delete")
@@ -56,7 +56,7 @@ public class ReviewController {
     public String editReview(@Valid @ModelAttribute ReviewDto reviewDto, Model model) {
         ReviewDto updatedReview = reviewService.updateReview(reviewDto);
         model.addAttribute("review", updatedReview);
-        return "redirect:/reviews/" + updatedReview.getId();
+        return "redirect:/reviews";
     }
 
     @GetMapping("/movie/{movieId}")

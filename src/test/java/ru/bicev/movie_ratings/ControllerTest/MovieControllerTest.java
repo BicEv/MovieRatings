@@ -1,6 +1,8 @@
 package ru.bicev.movie_ratings.ControllerTest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -10,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.beans.Transient;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,5 +80,49 @@ public class MovieControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/movies"));
     }
-    //TODO Complete test
+
+    @Test
+    public void getMovieByTitle() throws Exception {
+        when(movieService.findMovieByTitle(anyString())).thenReturn(movieDto);
+
+        mockMvc.perform(get("/movies/findByTitle").param("title", "Test title"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("movie/view"))
+                .andExpect(model().attributeExists("movie"))
+                .andExpect(model().attribute("movie", movieDto));
+
+    }
+
+    @Test
+    public void getMovieById() throws Exception {
+        when(movieService.findMovieById(anyLong())).thenReturn(movieDto);
+
+        mockMvc.perform(get("/movies/1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("movie/view"))
+                .andExpect(model().attributeExists("movie"))
+                .andExpect(model().attribute("movie", movieDto));
+
+    }
+
+    @Test
+    public void editMovieGet() throws Exception {
+        mockMvc.perform(get("/movies/edit"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("movie/edit"))
+                .andExpect(model().attributeExists("movie"));
+    }
+
+    @Test
+    public void editMoviePost() throws Exception {
+        when(movieService.updateMovie(any(MovieDto.class))).thenReturn(movieDto);
+
+        mockMvc.perform(post("/movies/edit")
+                .param("title", movieDto.getTitle())
+                .param("synopsis", movieDto.getSynopsis())
+                .param("genre", movieDto.getGenre())
+                .param("releaseYear", String.valueOf(movieDto.getReleaseYear())))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/movies"));
+    }
 }
