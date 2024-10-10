@@ -27,6 +27,8 @@ public class MovieDto {
 
     private List<Long> reviewIds;
 
+    private Double rating;
+
     public MovieDto() {
     }
 
@@ -83,6 +85,14 @@ public class MovieDto {
 
     public void setReviewIds(List<Long> reviewIds) {
         this.reviewIds = reviewIds;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
 }

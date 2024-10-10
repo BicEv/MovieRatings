@@ -34,7 +34,7 @@ public class UserService {
         if (userRepository.findByUserName(userDto.getUserName()).isPresent()) {
             throw new DuplicateUserException("User with this username already exists.");
         }
-
+        userDto.setRole("USER");
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User savedUser = userRepository.save(UserConverter.toEntity(userDto));
 

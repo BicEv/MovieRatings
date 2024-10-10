@@ -13,7 +13,7 @@ public class MovieConverter {
         if (movie == null) {
             return null;
         }
-        
+
         MovieDto movieDto = new MovieDto();
 
         movieDto.setId(movie.getId());
@@ -24,6 +24,7 @@ public class MovieConverter {
         List<Long> reviewIds = (movie.getReviews() != null) ? movie.getReviews().stream()
                 .map(Review::getId)
                 .collect(Collectors.toList()) : List.of();
+        movieDto.setRating(movie.getRating());
         movieDto.setReviewIds(reviewIds);
 
         return movieDto;

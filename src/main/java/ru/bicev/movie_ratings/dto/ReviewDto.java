@@ -12,10 +12,10 @@ public class ReviewDto {
     @Size(max = 1000, message = "Comment must be less than 1000 symbols")
     private String comment;
 
-    @NotNull(message = "User Id cannot be null")
+    @NotNull(message = "User cannot be null")
     private Long userId;
 
-    @NotNull(message = "Movie Id cannot be null")
+    @NotNull(message = "Movie cannot be null")
     private Long movieId;
 
     @Min(value = 1, message = "Rating should be from 1 to 5")

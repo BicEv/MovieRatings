@@ -3,6 +3,7 @@ package ru.bicev.movie_ratings.entitites;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,11 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+
 import ru.bicev.movie_ratings.utils.Role;
 
 @Entity
@@ -26,21 +23,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "Email cannot be empty")
-    @Email(message = "Ivalid email format")
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @NotEmpty(message = "Username cannot be empty")
-    @Size(min = 6, max = 14, message = "Username must be from 6 to 14 symbols long")
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must contains only letters and numbers")
+    @Column(nullable = false, unique = true)
     private String userName;
 
-    @NotEmpty(message = "Password cannot be empty")
-    @Size(min = 6, max = 14, message = "Password must be from 6 to 14 symbols long")
+    @Column(nullable = false)
     private String password;
 
-    @NotNull(message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

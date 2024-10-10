@@ -1,18 +1,15 @@
 package ru.bicev.movie_ratings.entitites;
 
-import java.time.Year;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Movie {
@@ -21,22 +18,21 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "Title cannot be empty")
-    @Size(min = 1, max = 50, message = "Title should be from 1 to 50 symbols long")
+    @Column(nullable = false)
     private String title;
 
-    @Size(max = 255, message = "Synopsis must be less than 256 symbols")
     private String synopsis;
 
-    @NotEmpty(message = "Genre cannot be empty")
+    @Column(nullable = false)
     private String genre;
 
-    @Min(value = 1900, message = "Year must be between 1900 and the current year")
-    @Max(value = Year.MAX_VALUE, message = "Year must be between 1900 and the current year")
     private int releaseYear;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private List<Review> reviews;
+
+    @Transient
+    private Double rating;
 
     public Movie() {
     }
@@ -96,6 +92,12 @@ public class Movie {
         this.synopsis = synopsis;
     }
 
-    
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
 
 }

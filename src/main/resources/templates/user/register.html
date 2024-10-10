@@ -26,6 +26,15 @@
         <input type="password" id="password" name="password" th:field="*{password}" required>
         <br><br>
 
+        <!-- Поле для выбора роли пользователя -->
+        <label for="role">Role:</label>
+        <select id="role" name="role" th:field="*{role}" required>
+            <option value="" disabled selected>Select a role</option>
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+        </select>
+        <br><br>
+
         <!-- Кнопка для отправки формы -->
         <button type="submit">Register</button>
     </form>

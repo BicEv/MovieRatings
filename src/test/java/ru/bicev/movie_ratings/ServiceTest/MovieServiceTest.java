@@ -1,5 +1,7 @@
 package ru.bicev.movie_ratings.ServiceTest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,6 +21,7 @@ import ru.bicev.movie_ratings.entitites.Movie;
 import ru.bicev.movie_ratings.exceptions.DuplicateMovieException;
 import ru.bicev.movie_ratings.exceptions.MovieNotFoundException;
 import ru.bicev.movie_ratings.repositories.MovieRepository;
+import ru.bicev.movie_ratings.repositories.ReviewRepository;
 import ru.bicev.movie_ratings.services.MovieService;
 
 public class MovieServiceTest {
@@ -30,6 +33,9 @@ public class MovieServiceTest {
 
     @Mock
     private MovieRepository movieRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @InjectMocks
     private MovieService movieService;
@@ -94,6 +100,7 @@ public class MovieServiceTest {
         movie.setId(1L);
 
         when(movieRepository.findByTitle(title)).thenReturn(Optional.of(movie));
+        when(reviewRepository.findAverageRatingByMovieId(1L)).thenReturn(4.0);
 
         MovieDto foundMovie = movieService.findMovieByTitle(title);
 
@@ -101,6 +108,7 @@ public class MovieServiceTest {
         assertEquals(synopsis, foundMovie.getSynopsis());
         assertEquals(year, foundMovie.getReleaseYear());
         assertEquals(genre, foundMovie.getGenre());
+        assertEquals(4.0, foundMovie.getRating());
     }
 
     @Test
@@ -116,6 +124,7 @@ public class MovieServiceTest {
         movie.setId(1L);
 
         when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
+        when(reviewRepository.findAverageRatingByMovieId(1L)).thenReturn(4.0);
 
         MovieDto foundMovie = movieService.findMovieById(1L);
 
@@ -123,6 +132,7 @@ public class MovieServiceTest {
         assertEquals(synopsis, foundMovie.getSynopsis());
         assertEquals(year, foundMovie.getReleaseYear());
         assertEquals(genre, foundMovie.getGenre());
+        assertEquals(4.0, foundMovie.getRating());
     }
 
     @Test
@@ -156,6 +166,36 @@ public class MovieServiceTest {
         when(movieRepository.findByTitle(title)).thenReturn(Optional.empty());
 
         assertThrows(MovieNotFoundException.class, () -> movieService.updateMovie(movieDto));
+    }
+
+    @Test
+    public void getAllMoviesWithRatingsSortedByRatingDesc_Success() {
+        Movie movie1 = new Movie("Movie 1", "Synopsis 1", "Genre 1", 2000);
+        movie1.setId(1L);
+        Movie movie2 = new Movie("Movie 2", "Synopsis 2", "Genre 2", 2005);
+        movie2.setId(2L);
+        Movie movie3 = new Movie("Movie 3", "Synopsis 3", "Genre 3", 2010);
+        movie3.setId(3L);
+
+        movie1.setRating(4.0);
+        movie2.setRating(3.5);
+        movie3.setRating(5.0);
+
+        List<Movie> movieList = new ArrayList<>(List.of(movie1, movie2, movie3));
+
+        when(movieRepository.findAll()).thenReturn(movieList);
+        when(reviewRepository.findAverageRatingByMovieId(1L)).thenReturn(4.0);
+        when(reviewRepository.findAverageRatingByMovieId(2L)).thenReturn(3.5);
+        when(reviewRepository.findAverageRatingByMovieId(3L)).thenReturn(5.0);
+
+        List<MovieDto> sortedMovies = movieService.getAllMoviesWithRatingsSortedByRatingDesc();
+
+        assertEquals(3, sortedMovies.size());
+        assertEquals("Movie 3", sortedMovies.get(0).getTitle());
+        assertEquals("Movie 1", sortedMovies.get(1).getTitle());
+        assertEquals("Movie 2", sortedMovies.get(2).getTitle());
+
+        verify(movieRepository, times(1)).findAll();
     }
 
 }
