@@ -1,5 +1,6 @@
 package ru.bicev.movie_ratings.api;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -15,27 +16,41 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import ru.bicev.movie_ratings.dto.ReviewDto;
+import ru.bicev.movie_ratings.dto.UserDto;
 import ru.bicev.movie_ratings.services.ReviewService;
+import ru.bicev.movie_ratings.services.UserService;
 
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewRestController {
 
     private final ReviewService reviewService;
+    private final UserService userService;
 
-    public ReviewRestController(ReviewService reviewService) {
+    public ReviewRestController(ReviewService reviewService, UserService userService) {
         this.reviewService = reviewService;
+        this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<ReviewDto> createReview(@Valid @RequestBody ReviewDto reviewDto) {
+    @PostMapping("/movies/{movieId}")
+    public ResponseEntity<ReviewDto> createReview(@PathVariable Long movieId, @Valid @RequestBody ReviewDto reviewDto,
+            Principal principal) {
+        String email = principal.getName();
+        UserDto userDto = userService.getUserByEmail(email);
+
+        reviewDto.setUserId(userDto.getId());
+        reviewDto.setMovieId(movieId);
+
         ReviewDto createdReview = reviewService.createReview(reviewDto);
         return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
-        reviewService.deleteReview(id);
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id, Principal principal) {
+        String email = principal.getName();
+        UserDto userDto = userService.getUserByEmail(email);
+
+        reviewService.deleteReview(id, userDto.getId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -51,9 +66,16 @@ public class ReviewRestController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-    @PutMapping("/edit")
-    public ResponseEntity<ReviewDto> editReview(@Valid @RequestBody ReviewDto reviewDto) {
-        ReviewDto updatedReview = reviewService.updateReview(reviewDto);
+    @PutMapping("/movies/{movieId}/reviews")
+    public ResponseEntity<ReviewDto> editReview(@PathVariable Long movieId, @Valid @RequestBody ReviewDto reviewDto,
+            Principal principal) {
+        String email = principal.getName();
+        UserDto userDto = userService.getUserByEmail(email);
+
+        reviewDto.setUserId(userDto.getId());
+        reviewDto.setMovieId(movieId);
+
+        ReviewDto updatedReview = reviewService.updateReview(reviewDto, userDto.getId());
         return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
 

@@ -11,6 +11,7 @@ import ru.bicev.movie_ratings.dto.ReviewDto;
 import ru.bicev.movie_ratings.entitites.Movie;
 import ru.bicev.movie_ratings.entitites.Review;
 import ru.bicev.movie_ratings.entitites.User;
+import ru.bicev.movie_ratings.exceptions.IllegalAccessException;
 import ru.bicev.movie_ratings.exceptions.MovieNotFoundException;
 import ru.bicev.movie_ratings.exceptions.ReviewNotFoundException;
 import ru.bicev.movie_ratings.exceptions.UserNotFoundException;
@@ -34,6 +35,12 @@ public class ReviewService {
         this.userRepository = userRepository;
     }
 
+    public ReviewDto findReviewById(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("Review with id: " + reviewId + " is not found"));
+        return ReviewConverter.toDto(review);
+    }
+
     @Transactional
     public ReviewDto createReview(ReviewDto reviewDto) {
         User user = userRepository.findById(reviewDto.getUserId()).orElseThrow(
@@ -47,9 +54,12 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId)
+    public void deleteReview(Long reviewId, Long currentUserId) {
+        Review foundReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewNotFoundException("Review with id: " + reviewId + " is not found"));
+        if (!foundReview.getUser().getId().equals(currentUserId)) {
+            throw new IllegalAccessException("You are not allowed to edit this review.");
+        }
         reviewRepository.deleteById(reviewId);
     }
 
@@ -69,9 +79,14 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto updateReview(ReviewDto reviewDto) {
+    public ReviewDto updateReview(ReviewDto reviewDto, Long currentUserId) {
         Review foundReview = reviewRepository.findByUserIdAndMovieId(reviewDto.getUserId(), reviewDto.getMovieId())
                 .orElseThrow(() -> new ReviewNotFoundException("Review not found for this user and movie"));
+
+        if (!foundReview.getUser().getId().equals(currentUserId)) {
+            throw new IllegalAccessException("You are not allowed to edit this review.");
+        }
+
         foundReview.setComment(reviewDto.getComment());
         foundReview.setRating(reviewDto.getRating());
         reviewRepository.save(foundReview);
