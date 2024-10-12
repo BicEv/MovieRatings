@@ -1,7 +1,9 @@
 package ru.bicev.movie_ratings.api;
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +28,20 @@ public class MovieRestController {
         this.movieService = movieService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<MovieDto>> getAllMoviesSortedByRating() {
+        List<MovieDto> movieDtos = movieService.getAllMoviesWithRatingsSortedByRatingDesc();
+        return new ResponseEntity<>(movieDtos, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<MovieDto> createMovie(@Valid @RequestBody MovieDto movieDto) {
         MovieDto createdMovie = movieService.createMovie(movieDto);
         return new ResponseEntity<MovieDto>(createdMovie, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
@@ -50,6 +60,7 @@ public class MovieRestController {
         return new ResponseEntity<MovieDto>(foundMovie, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/edit")
     public ResponseEntity<MovieDto> editMovie(@Valid @RequestBody MovieDto movieDto) {
         MovieDto updatedMovie = movieService.updateMovie(movieDto);

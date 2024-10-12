@@ -79,9 +79,9 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto updateReview(ReviewDto reviewDto, Long currentUserId) {
-        Review foundReview = reviewRepository.findByUserIdAndMovieId(reviewDto.getUserId(), reviewDto.getMovieId())
-                .orElseThrow(() -> new ReviewNotFoundException("Review not found for this user and movie"));
+    public ReviewDto updateReview(Long reviewId, ReviewDto reviewDto, Long currentUserId) {
+        Review foundReview = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("Review not found"));
 
         if (!foundReview.getUser().getId().equals(currentUserId)) {
             throw new IllegalAccessException("You are not allowed to edit this review.");

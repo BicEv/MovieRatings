@@ -1,6 +1,7 @@
 package ru.bicev.movie_ratings.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,12 +27,20 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    @GetMapping
+    public String showMovieList(Model model) {
+        model.addAttribute("movies", movieService.getAllMoviesWithRatingsSortedByRatingDesc());
+        return "movie/list";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/create")
     public String showCreationForm(Model model) {
         model.addAttribute("movie", new MovieDto());
         return "movie/create";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public String createMovie(@Valid @ModelAttribute MovieDto movieDto, Model model) {
         MovieDto createdMovie = movieService.createMovie(movieDto);
@@ -39,6 +48,7 @@ public class MovieController {
         return "redirect:/movies";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}/delete")
     public String deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
@@ -59,12 +69,14 @@ public class MovieController {
         return "movie/view";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/edit")
     public String showEditMovieForm(Model model) {
         model.addAttribute("movie", new MovieDto());
         return "movie/edit";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/edit")
     public String editMovie(@Valid @ModelAttribute MovieDto movieDto, Model model) {
         MovieDto updatedMovie = movieService.updateMovie(movieDto);

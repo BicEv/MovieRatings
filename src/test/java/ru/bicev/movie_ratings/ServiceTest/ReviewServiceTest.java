@@ -19,6 +19,7 @@ import ru.bicev.movie_ratings.dto.ReviewDto;
 import ru.bicev.movie_ratings.entitites.Movie;
 import ru.bicev.movie_ratings.entitites.Review;
 import ru.bicev.movie_ratings.entitites.User;
+import ru.bicev.movie_ratings.exceptions.IllegalAccessException;
 import ru.bicev.movie_ratings.exceptions.MovieNotFoundException;
 import ru.bicev.movie_ratings.exceptions.ReviewNotFoundException;
 import ru.bicev.movie_ratings.exceptions.UserNotFoundException;
@@ -103,19 +104,33 @@ public class ReviewServiceTest {
     public void deleteReview_Success() {
         Review review = new Review("Test comment", user, movie, 4);
         review.setId(1L);
+        user.setId(1L);
 
         when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        reviewService.deleteReview(1L);
+        reviewService.deleteReview(1L, 1L);
 
         verify(reviewRepository, times(1)).deleteById(1L);
     }
 
     @Test
-    public void deleteReview_ThrowsException() {
+    public void deleteReview_ThrowsReviewNotFoundException() {
         when(reviewRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ReviewNotFoundException.class, () -> reviewService.deleteReview(1L));
+        assertThrows(ReviewNotFoundException.class, () -> reviewService.deleteReview(1L, 1L));
+    }
+
+    @Test
+    public void deleteReview_ShouldThrowIllegallAccessException() {
+        Review review = new Review("Test comment", user, movie, 4);
+        review.setId(1L);
+        user.setId(2L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+
+        assertThrows(IllegalAccessException.class, () -> reviewService.deleteReview(1L, 1L));
+
     }
 
     @Test
@@ -156,12 +171,14 @@ public class ReviewServiceTest {
     public void updateReview_Success() {
         Review review = new Review("Test comment", user, movie, 4);
         review.setId(1L);
+        user.setId(1L);
 
-        when(reviewRepository.findByUserIdAndMovieId(1L, 1L)).thenReturn(Optional.of(review));
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         ReviewDto reviewDto = new ReviewDto("Changed comment", 1L, 1L, 2);
 
-        ReviewDto changedReview = reviewService.updateReview(reviewDto);
+        ReviewDto changedReview = reviewService.updateReview(1L, reviewDto, 1L);
 
         assertEquals(reviewDto.getComment(), changedReview.getComment());
         assertEquals(reviewDto.getRating(), changedReview.getRating());
@@ -170,10 +187,23 @@ public class ReviewServiceTest {
     }
 
     @Test
-    public void updateReview_ThrowsException() {
-        when(reviewRepository.findByUserIdAndMovieId(1L, 1L)).thenReturn(Optional.empty());
+    public void updateReview_ThrowsReviewNotFoundExceptionException() {
+        when(reviewRepository.findById(1L)).thenReturn(Optional.empty());
         ReviewDto reviewDto = new ReviewDto("Changed comment", 1L, 1L, 2);
-        assertThrows(ReviewNotFoundException.class, () -> reviewService.updateReview(reviewDto));
+        assertThrows(ReviewNotFoundException.class, () -> reviewService.updateReview(1L, reviewDto, 1L));
+    }
+
+    @Test
+    public void updateReview_ThrowsIllegalAccessException() {
+        Review review = new Review("Test comment", user, movie, 4);
+        review.setId(1L);
+        user.setId(2L);
+        ReviewDto reviewDto = new ReviewDto("Changed comment", 1L, 1L, 2);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(reviewRepository.findById(1L))
+                .thenReturn(Optional.of(review));
+
+        assertThrows(IllegalAccessException.class, () -> reviewService.updateReview(1L, reviewDto, 1L));
     }
 
 }

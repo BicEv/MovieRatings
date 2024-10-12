@@ -21,7 +21,7 @@ import ru.bicev.movie_ratings.services.ReviewService;
 import ru.bicev.movie_ratings.services.UserService;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/movies/{movieId}/reviews")
 public class ReviewRestController {
 
     private final ReviewService reviewService;
@@ -32,7 +32,7 @@ public class ReviewRestController {
         this.userService = userService;
     }
 
-    @PostMapping("/movies/{movieId}")
+    @PostMapping
     public ResponseEntity<ReviewDto> createReview(@PathVariable Long movieId, @Valid @RequestBody ReviewDto reviewDto,
             Principal principal) {
         String email = principal.getName();
@@ -45,7 +45,7 @@ public class ReviewRestController {
         return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long id, Principal principal) {
         String email = principal.getName();
         UserDto userDto = userService.getUserByEmail(email);
@@ -54,20 +54,17 @@ public class ReviewRestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/movie/{movieId}")
+    @GetMapping
     public ResponseEntity<List<ReviewDto>> getReviewsByMovieId(@PathVariable Long movieId) {
         List<ReviewDto> reviews = reviewService.getReviewsByMovie(movieId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReviewDto>> getReviewsByUserId(@PathVariable Long userId) {
-        List<ReviewDto> reviews = reviewService.getReviewsByUser(userId);
-        return new ResponseEntity<>(reviews, HttpStatus.OK);
-    }
+    
 
-    @PutMapping("/movies/{movieId}/reviews")
-    public ResponseEntity<ReviewDto> editReview(@PathVariable Long movieId, @Valid @RequestBody ReviewDto reviewDto,
+    @PutMapping("{id}")
+    public ResponseEntity<ReviewDto> editReview(@PathVariable Long id, @PathVariable Long movieId,
+            @Valid @RequestBody ReviewDto reviewDto,
             Principal principal) {
         String email = principal.getName();
         UserDto userDto = userService.getUserByEmail(email);
@@ -75,7 +72,7 @@ public class ReviewRestController {
         reviewDto.setUserId(userDto.getId());
         reviewDto.setMovieId(movieId);
 
-        ReviewDto updatedReview = reviewService.updateReview(reviewDto, userDto.getId());
+        ReviewDto updatedReview = reviewService.updateReview(id, reviewDto, userDto.getId());
         return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
 
