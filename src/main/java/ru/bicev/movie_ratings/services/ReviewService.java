@@ -89,6 +89,7 @@ public class ReviewService {
 
         foundReview.setComment(reviewDto.getComment());
         foundReview.setRating(reviewDto.getRating());
+        
         reviewRepository.save(foundReview);
         return ReviewConverter.toDto(foundReview);
     }

@@ -2,7 +2,6 @@ package ru.bicev.movie_ratings.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class ReviewDto {
@@ -12,10 +11,8 @@ public class ReviewDto {
     @Size(max = 1000, message = "Comment must be less than 1000 symbols")
     private String comment;
 
-    @NotNull(message = "User cannot be null")
     private Long userId;
 
-    @NotNull(message = "Movie cannot be null")
     private Long movieId;
 
     @Min(value = 1, message = "Rating should be from 1 to 5")

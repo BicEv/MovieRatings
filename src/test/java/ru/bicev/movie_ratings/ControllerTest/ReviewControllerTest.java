@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,6 +32,7 @@ import ru.bicev.movie_ratings.controllers.ReviewController;
 import ru.bicev.movie_ratings.controllers.UserReviewController;
 import ru.bicev.movie_ratings.dto.ReviewDto;
 import ru.bicev.movie_ratings.dto.UserDto;
+import ru.bicev.movie_ratings.exceptions.IllegalAccessException;
 import ru.bicev.movie_ratings.exceptions.ReviewNotFoundException;
 import ru.bicev.movie_ratings.services.ReviewService;
 import ru.bicev.movie_ratings.services.UserService;
@@ -98,7 +100,8 @@ public class ReviewControllerTest {
 
     @Test
     public void editReviewGet() throws Exception {
-        mockMvc.perform(get("/movies/1/reviews/edit")
+        when(reviewService.findReviewById(anyLong())).thenReturn(reviewDto);
+        mockMvc.perform(get("/movies/1/reviews/1/edit")
                 .with(user("test@email.com").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("review/edit"))
@@ -106,15 +109,16 @@ public class ReviewControllerTest {
     }
 
     @Test
-    public void editReviewPost() throws Exception {
+    public void editReviewPut() throws Exception {
         when(reviewService.updateReview(anyLong(), any(ReviewDto.class), anyLong())).thenReturn(reviewDto);
         when(userService.getUserByEmail(anyString())).thenReturn(userDto);
 
-        mockMvc.perform(post("/movies/1/reviews/edit")
+        reviewDto.setUserId(userDto.getId());
+
+        mockMvc.perform(put("/movies/1/reviews/1/edit")
                 .with(user("test@email.com").roles("USER"))
                 .param("id", String.valueOf(reviewDto.getId()))
                 .param("comment", reviewDto.getComment())
-                .param("userId", String.valueOf(reviewDto.getUserId()))
                 .param("movieId", String.valueOf(reviewDto.getMovieId()))
                 .param("rating", String.valueOf(reviewDto.getRating())))
                 .andExpect(status().is3xxRedirection())
@@ -145,14 +149,26 @@ public class ReviewControllerTest {
 
     @Test
     public void testHandleNotFoundException() throws Exception {
-        doThrow(new ReviewNotFoundException("Review not found")).when(reviewService).deleteReview(anyLong(), anyLong());
+        doThrow(new ReviewNotFoundException("Review not found")).when(reviewService).findReviewById(anyLong());
 
         when(userService.getUserByEmail(anyString())).thenReturn(userDto);
 
-        mockMvc.perform(delete("/movies/1/reviews/1")
+        mockMvc.perform(get("/movies/1/reviews/1/edit")
                 .with(user("test@email.com").roles("USER")))
                 .andExpect(view().name("error/404"))
-                .andExpect(model().attribute("message", "Caught in controller: Review not found"));
+                .andExpect(model().attribute("message", "Not found: Review not found"));
+    }
+
+    @Test
+    public void testHandleIllegalAccessException() throws Exception {
+        when(userService.getUserByEmail(anyString())).thenReturn(userDto);
+        doThrow(new IllegalAccessException("You are not allowed to do this")).when(reviewService)
+                .deleteReview(anyLong(), anyLong());
+
+        mockMvc.perform(delete("/movies/1/reviews/1")
+                .with(user("test@email.com").roles("USER")))
+                .andExpect(view().name("error/403"))
+                .andExpect(model().attribute("message", "Forbidden: You are not allowed to do this"));
     }
 
     @Test
@@ -167,6 +183,6 @@ public class ReviewControllerTest {
                 .param("movieId", String.valueOf(reviewDto.getMovieId()))
                 .param("rating", String.valueOf(reviewDto.getRating())))
                 .andExpect(view().name("error/500"))
-                .andExpect(model().attribute("message", "Caught in controller: General error"));
+                .andExpect(model().attribute("message", "Internal server error: General error"));
     }
 }

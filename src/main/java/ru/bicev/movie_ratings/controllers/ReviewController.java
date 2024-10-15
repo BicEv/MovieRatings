@@ -4,7 +4,6 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,13 +12,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import jakarta.validation.Valid;
 import ru.bicev.movie_ratings.dto.ReviewDto;
 import ru.bicev.movie_ratings.dto.UserDto;
+import ru.bicev.movie_ratings.exceptions.IllegalAccessException;
+import ru.bicev.movie_ratings.exceptions.MovieNotFoundException;
 import ru.bicev.movie_ratings.exceptions.ReviewNotFoundException;
+import ru.bicev.movie_ratings.exceptions.UserNotFoundException;
 import ru.bicev.movie_ratings.services.ReviewService;
 import ru.bicev.movie_ratings.services.UserService;
 
@@ -36,7 +38,7 @@ public class ReviewController {
         this.userService = userService;
     }
 
-    @GetMapping("create")
+    @GetMapping("/create")
     public String showCreationForm(@PathVariable Long movieId, Model model) {
         model.addAttribute("movieId", movieId);
         model.addAttribute("review", new ReviewDto());
@@ -55,7 +57,7 @@ public class ReviewController {
         return "redirect:/movies/" + movieId;
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public String deleteReview(@PathVariable Long id, Principal principal) {
         String email = principal.getName();
         UserDto userDto = userService.getUserByEmail(email);
@@ -64,24 +66,25 @@ public class ReviewController {
         return "redirect:/movies";
     }
 
-    @GetMapping("edit")
-    public String showEditForm(@PathVariable Long movieId, Model model) {
+    @GetMapping("/{reviewId}/edit")
+    public String showEditForm(@PathVariable Long reviewId, @PathVariable Long movieId, Model model) {
+        ReviewDto review = reviewService.findReviewById(reviewId);
+
+        model.addAttribute("review", review);
         model.addAttribute("movieId", movieId);
-        model.addAttribute("review", new ReviewDto());
+
         return "review/edit";
     }
 
-    @PostMapping("edit")
-    public String editReview(@PathVariable Long movieId, @Valid @ModelAttribute ReviewDto reviewDto,
+    @PutMapping("/{reviewId}/edit")
+    public String editReview(@PathVariable Long reviewId, @PathVariable Long movieId,
+            @Valid @ModelAttribute ReviewDto reviewDto,
             Model model, Principal principal) {
         String email = principal.getName();
-        UserDto userDto = userService.getUserByEmail(email);
+        Long userId = userService.getUserByEmail(email).getId();
 
-        reviewDto.setUserId(userDto.getId());
-        reviewDto.setMovieId(movieId);
-        ReviewDto updatedReview = reviewService.updateReview(reviewDto.getId(), reviewDto, userDto.getId());
+        reviewService.updateReview(reviewId, reviewDto, userId);
 
-        model.addAttribute("review", updatedReview);
         return "redirect:/movies/" + movieId;
     }
 
@@ -92,19 +95,21 @@ public class ReviewController {
         return "review/list";
     }
 
-    @ExceptionHandler(ReviewNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({ ReviewNotFoundException.class, UserNotFoundException.class, MovieNotFoundException.class })
     public String handleNotFoundException(ReviewNotFoundException ex, Model model) {
-        System.out.println("Handling ReviewNotFoundException: " + ex.getMessage());
-        model.addAttribute("message", "Caught in controller: " + ex.getMessage());
+        model.addAttribute("message", "Not found: " + ex.getMessage());
         return "error/404";
     }
 
+    @ExceptionHandler(IllegalAccessException.class)
+    public String handleIllegalAccessException(IllegalAccessException ex, Model model) {
+        model.addAttribute("message", "Forbidden: " + ex.getMessage());
+        return "error/403";
+    }
+
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleGeneralException(Exception ex, Model model) {
-        System.out.println("Handling ReviewNotFoundException: " + ex.getMessage());
-        model.addAttribute("message", "Caught in controller: " + ex.getMessage());
+        model.addAttribute("message", "Internal server error: " + ex.getMessage());
         return "error/500";
     }
 
