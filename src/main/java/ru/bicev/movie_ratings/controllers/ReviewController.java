@@ -45,6 +45,16 @@ public class ReviewController {
         return "review/create";
     }
 
+    @GetMapping("/{reviewId}")
+    public String getReviewById(@PathVariable Long movieId, @PathVariable Long reviewId, Model model) {
+        ReviewDto review = reviewService.findReviewById(reviewId);
+
+        model.addAttribute("movieId", movieId);
+        model.addAttribute("review", review);
+
+        return "review/view";
+    }
+
     @PostMapping
     public String createReview(@PathVariable Long movieId, @Valid @ModelAttribute ReviewDto reviewDto, Model model,
             Principal principal) {

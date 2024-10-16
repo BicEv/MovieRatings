@@ -29,18 +29,22 @@
                 <td th:text="${review.comment}"></td>
                 <td th:text="${review.rating}"></td>
                 <td>
-                    <!-- Кнопки действий для каждого отзыва: Просмотр, Редактирование, Удаление -->
-                    <a th:href="@{/reviews/{id}(id=${review.id})}">View</a> |
-                    <a th:href="@{/reviews/edit(id=${review.id})}">Edit</a> |
-                    <form th:action="@{/reviews/{id}/delete(id=${review.id})}" method="post" style="display:inline">
+                    <!-- Просмотр и редактирование отзывов с привязкой к фильму -->
+                    <a th:href="@{|/movies/{movieId}/reviews/{reviewId}|(movieId=${review.movieId}, reviewId=${review.id})}">View</a> |
+                    <a th:href="@{|/movies/{movieId}/reviews/{reviewId}/edit|(movieId=${review.movieId}, reviewId=${review.id})}">Edit</a> |
+                    
+                    <!-- Удаление отзыва, привязанного к фильму -->
+                    <form th:action="@{|/movies/{movieId}/reviews/{reviewId}/delete|(movieId=${review.movieId}, reviewId=${review.id})}" method="post" style="display:inline">
+                        <input type="hidden" name="_method" value="delete" />
                         <button type="submit">Delete</button>
                     </form>
                 </td>
             </tr>
         </tbody>
     </table>
-    <!-- Ссылка для создания нового отзыва -->
-    <a th:href="@{/reviews/create}">Create New Review</a>
+
+    <!-- Ссылка для создания нового отзыва, привязанного к фильму -->
+    <a th:href="@{|/movies/{movieId}/reviews/create|(movieId=${movieId})}">Create New Review</a>
 </body>
 
 </html>

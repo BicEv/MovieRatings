@@ -22,7 +22,11 @@
         <input type="hidden" name="_method" value="delete" />
         <button type="submit">Delete Movie</button>
     </form>
+
     <br />
+    <a th:href="@{/movies/{id}/reviews/create(id=${movie.id})}">Add Review</a>
+    <br />
+
     <a th:href="@{/movies}">Back to Movie List</a>
 </body>
 

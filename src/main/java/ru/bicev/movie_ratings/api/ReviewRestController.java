@@ -45,13 +45,24 @@ public class ReviewRestController {
         return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id, Principal principal) {
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId, Principal principal) {
         String email = principal.getName();
         UserDto userDto = userService.getUserByEmail(email);
 
-        reviewService.deleteReview(id, userDto.getId());
+        reviewService.deleteReview(reviewId, userDto.getId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<ReviewDto> getReviewById(@PathVariable Long reviewId, @PathVariable Long movieId) {
+        ReviewDto review = reviewService.findReviewById(reviewId);
+
+        if (!review.getMovieId().equals(movieId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(review, HttpStatus.OK);
     }
 
     @GetMapping
@@ -60,19 +71,15 @@ public class ReviewRestController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-    
-
-    @PutMapping("{id}")
-    public ResponseEntity<ReviewDto> editReview(@PathVariable Long id, @PathVariable Long movieId,
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<ReviewDto> editReview(@PathVariable Long reviewId, @PathVariable Long movieId,
             @Valid @RequestBody ReviewDto reviewDto,
             Principal principal) {
+
         String email = principal.getName();
-        UserDto userDto = userService.getUserByEmail(email);
+        Long userId = userService.getUserByEmail(email).getId();
 
-        reviewDto.setUserId(userDto.getId());
-        reviewDto.setMovieId(movieId);
-
-        ReviewDto updatedReview = reviewService.updateReview(id, reviewDto, userDto.getId());
+        ReviewDto updatedReview = reviewService.updateReview(reviewId, reviewDto, userId);
         return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
 

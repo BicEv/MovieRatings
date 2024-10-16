@@ -201,4 +201,26 @@ public class ReviewRestControllerTest {
 
     }
 
+    @Test
+    public void getReviewById_ShouldReturnReview() throws Exception {
+        when(reviewService.findReviewById(anyLong())).thenReturn(reviewDto);
+        String expectedJson = objectMapper.writeValueAsString(reviewDto);
+
+        mockMvc.perform(get("/api/movies/1/reviews/1")
+                .with(user("test@email.com").roles("USER")))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJson));
+    }
+
+    @Test
+    public void getReviewById_ShouldThrowException() throws Exception {
+        when(reviewService.findReviewById(anyLong())).thenThrow(new ReviewNotFoundException("Review not found"));
+
+        mockMvc.perform(get("/api/movies/1/reviews/1")
+                .with(user("test@email.com").roles("USER")))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("404 Not found: Review not found"));
+    }
+
 }

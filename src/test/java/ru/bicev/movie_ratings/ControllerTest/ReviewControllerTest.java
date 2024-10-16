@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import java.util.List;
@@ -184,5 +185,27 @@ public class ReviewControllerTest {
                 .param("rating", String.valueOf(reviewDto.getRating())))
                 .andExpect(view().name("error/500"))
                 .andExpect(model().attribute("message", "Internal server error: General error"));
+    }
+
+    @Test
+    public void getReviewById_ShouldReturnReview() throws Exception {
+        when(reviewService.findReviewById(anyLong())).thenReturn(reviewDto);
+
+        mockMvc.perform(get("/movies/1/reviews/1")
+                .with(user("test@email.com").roles("USER"))
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("review/view"))
+                .andExpect(model().attributeExists("review"));
+    }
+
+    @Test
+    public void getReviewById_ShouldThrowException() throws Exception {
+        when(reviewService.findReviewById(anyLong())).thenThrow(new ReviewNotFoundException("Review not found"));
+
+        mockMvc.perform(get("/movies/1/reviews/1")
+                .with(user("test@email.com").roles("USER")))
+                .andExpect(view().name("error/404"))
+                .andExpect(model().attribute("message", "Not found: Review not found"));
     }
 }

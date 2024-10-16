@@ -17,14 +17,21 @@
         <p><strong>Rating:</strong> <span th:text="${review.rating}"></span></p>
     </div>
     <!-- Кнопка для редактирования отзыва -->
-    <a th:href="@{/reviews/edit(id=${review.id})}">Edit Review</a> |
-    <!-- Форма для удаления отзыва с использованием метода POST -->
-    <form th:action="@{/reviews/{id}/delete(id=${review.id})}" method="post" style="display:inline">
+    <a th:href="@{|/movies/{movieId}/reviews/{reviewId}/edit|(movieId=${review.movieId}, reviewId=${review.id})}">Edit
+        Review</a> |
+
+    <!-- Форма для удаления отзыва с использованием метода DELETE -->
+    <form th:action="@{|/movies/{movieId}/reviews/{reviewId}/delete|(movieId=${review.movieId}, reviewId=${review.id})}"
+        method="post" style="display:inline">
+        <!-- CSRF-токен -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <!-- Поле для указания метода DELETE -->
+        <input type="hidden" name="_method" value="delete" />
         <button type="submit">Delete Review</button>
     </form>
     <br />
-    <!-- Ссылка для возврата к списку всех отзывов -->
-    <a th:href="@{/reviews}">Back to Review List</a>
+    <!-- Ссылка для возврата к списку всех отзывов фильма -->
+    <a th:href="@{|/movies/{movieId}/reviews|(movieId=${review.movieId})}">Back to Review List</a>
 </body>
 
 </html>
