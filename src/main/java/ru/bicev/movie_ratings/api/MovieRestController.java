@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.models.annotations.OpenAPI30;
 import jakarta.validation.Valid;
 import ru.bicev.movie_ratings.dto.MovieDto;
 import ru.bicev.movie_ratings.services.MovieService;
@@ -28,12 +30,14 @@ public class MovieRestController {
         this.movieService = movieService;
     }
 
+    @Operation(summary = "Get list of all movies sorted by rating desc")
     @GetMapping
     public ResponseEntity<List<MovieDto>> getAllMoviesSortedByRating() {
         List<MovieDto> movieDtos = movieService.getAllMoviesWithRatingsSortedByRatingDesc();
         return new ResponseEntity<>(movieDtos, HttpStatus.OK);
     }
 
+    @Operation(summary = "Create new movie, only for admins")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<MovieDto> createMovie(@Valid @RequestBody MovieDto movieDto) {
@@ -41,6 +45,7 @@ public class MovieRestController {
         return new ResponseEntity<MovieDto>(createdMovie, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Delete movie, only for admins")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
@@ -48,18 +53,21 @@ public class MovieRestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Get movie by title")
     @GetMapping("/title")
     public ResponseEntity<MovieDto> getMovieByTitle(@RequestParam String title) {
         MovieDto foundMovie = movieService.findMovieByTitle(title);
         return new ResponseEntity<MovieDto>(foundMovie, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get movie by id")
     @GetMapping("/{id}")
     public ResponseEntity<MovieDto> getMovieById(@PathVariable Long id) {
         MovieDto foundMovie = movieService.findMovieById(id);
         return new ResponseEntity<MovieDto>(foundMovie, HttpStatus.OK);
     }
 
+    @Operation(summary = "Edit movie, only for admins")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/edit")
     public ResponseEntity<MovieDto> editMovie(@Valid @RequestBody MovieDto movieDto) {

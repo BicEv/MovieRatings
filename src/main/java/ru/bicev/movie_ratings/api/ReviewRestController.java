@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import ru.bicev.movie_ratings.dto.ReviewDto;
 import ru.bicev.movie_ratings.dto.UserDto;
@@ -32,6 +33,7 @@ public class ReviewRestController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Create review")
     @PostMapping
     public ResponseEntity<ReviewDto> createReview(@PathVariable Long movieId, @Valid @RequestBody ReviewDto reviewDto,
             Principal principal) {
@@ -45,6 +47,7 @@ public class ReviewRestController {
         return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Delete review by id")
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId, Principal principal) {
         String email = principal.getName();
@@ -54,6 +57,7 @@ public class ReviewRestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Get review by id")
     @GetMapping("/{reviewId}")
     public ResponseEntity<ReviewDto> getReviewById(@PathVariable Long reviewId, @PathVariable Long movieId) {
         ReviewDto review = reviewService.findReviewById(reviewId);
@@ -65,12 +69,14 @@ public class ReviewRestController {
         return new ResponseEntity<>(review, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get list of reviews by movie id")
     @GetMapping
     public ResponseEntity<List<ReviewDto>> getReviewsByMovieId(@PathVariable Long movieId) {
         List<ReviewDto> reviews = reviewService.getReviewsByMovie(movieId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
+    @Operation(summary = "Edit review by id")
     @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewDto> editReview(@PathVariable Long reviewId, @PathVariable Long movieId,
             @Valid @RequestBody ReviewDto reviewDto,

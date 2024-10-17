@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import ru.bicev.movie_ratings.dto.ReviewDto;
 import ru.bicev.movie_ratings.services.ReviewService;
 
@@ -22,6 +23,7 @@ public class UserReviewRestController {
         this.reviewService = reviewService;
     }
 
+    @Operation(summary = "Get list of reviews by user id")
     @GetMapping
     public ResponseEntity<List<ReviewDto>> getReviewsByUserId(@PathVariable Long userId) {
         List<ReviewDto> reviews = reviewService.getReviewsByUser(userId);
