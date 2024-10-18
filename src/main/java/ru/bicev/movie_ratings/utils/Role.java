@@ -4,7 +4,7 @@ package ru.bicev.movie_ratings.utils;
  * Enumeration representing the different roles a user can have in te system.
  * <p>
  * Roles determine the level of access and permissions granted to a user.
- * <p>
+ * </p>
  */
 public enum Role {
     /**

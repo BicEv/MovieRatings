@@ -12,7 +12,7 @@ import ru.bicev.movie_ratings.entitites.User;
  * vice versa,
  * faciliating the transfer of review data between different layers of the
  * application.
- * <p>
+ * </p>
  */
 public class ReviewConverter {
 
