@@ -9,18 +9,34 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import ru.bicev.movie_ratings.repositories.UserRepository;
 
+/**
+ * Initializes default data for the application on startup.
+ * Specifically, it checks if an admin user exists and creates one if it does
+ * not.
+ */
 @Component
 public class DataInitializer {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Constructor for injecting dependencies.
+     * 
+     * @param userRepository  the repository used to access user data
+     * @param passwordEncoder the password encoder used to encode password
+     */
     @Autowired
     public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Initializes the admin user after the application context is created.
+     * If an admin with the email "admin@examole.com" does not exist, it creates one
+     * with a predefined password.
+     */
     @PostConstruct
     public void init() {
         if (userRepository.findByEmail("admin@example.com").isEmpty()) {

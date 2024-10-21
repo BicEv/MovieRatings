@@ -16,22 +16,49 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 import ru.bicev.movie_ratings.services.CustomUserDetailsService;
 
+/**
+ * Configuration class for setting up security in the application.
+ * This includes configuring the authentication, password encoding and access
+ * for various routes.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
+    /**
+     * Constructor for injecting custom user details service.
+     * 
+     * @param userDetailsService the service that prvides user-specific security
+     *                           information
+     */
     @Autowired
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Bean to handle HTTP methods (like PUT, DELETE) that are sent via hidden
+     * fields in HTML forms.
+     * 
+     * @return a filter that allows the use of HTTP methods other than GET and POST
+     *         in forms.
+     */
     @Bean
     public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
         return new HiddenHttpMethodFilter();
     }
 
+    /**
+     * Configures the authentication manager with the user details service and
+     * password encoder.
+     *
+     * @param http the {@link HttpSecurity} instance used to configure security
+     *             settings.
+     * @return the {@link AuthenticationManager} configured for the application.
+     * @throws Exception if an error occurs during configuration.
+     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -39,6 +66,16 @@ public class SecurityConfig {
         return auth.build();
     }
 
+    /**
+     * Defines the security filter chain for the application, configuring access
+     * rules for different endpoints,
+     * login and logout settings, and CSRF protection.
+     *
+     * @param http the {@link HttpSecurity} instance used to configure security
+     *             settings.
+     * @return a fully built {@link SecurityFilterChain}.
+     * @throws Exception if an error occurs during configuration.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -65,6 +102,11 @@ public class SecurityConfig {
 
     }
 
+    /**
+     * Provides a bean for password encoding using BCrypt.
+     *
+     * @return a {@link PasswordEncoder} that uses the BCrypt hashing algorithm.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
