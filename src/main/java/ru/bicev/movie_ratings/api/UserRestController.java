@@ -18,17 +18,36 @@ import jakarta.validation.Valid;
 import ru.bicev.movie_ratings.dto.UserDto;
 import ru.bicev.movie_ratings.services.UserService;
 
+/**
+ * REST Controller responsible for handling user-related operations such as
+ * register, updating, password changes and retrieving user information.
+ * <p>
+ * This controller provides endpoints for public access.
+ * </p>
+ */
 @RestController
 @RequestMapping("/api/users")
 public class UserRestController {
 
     private final UserService userService;
 
+    /**
+     * Constructor to inject dependencies
+     * 
+     * @param userService service the handles user-related operations
+     */
     @Autowired
     public UserRestController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Registers new user in the system
+     * 
+     * @param userDto the user data to be created, validated using {@link Valid}
+     * @return {@link ResponseEntity} containing the created {@link UserDto},
+     *         wrapped in HTTP status 201 (Created).
+     */
     @Operation(summary = "Register new user")
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
@@ -36,6 +55,13 @@ public class UserRestController {
         return new ResponseEntity<UserDto>(createdUser, HttpStatus.CREATED);
     }
 
+    /**
+     * Updates user information
+     * 
+     * @param userDto the user data to be updated, validated using {@link Valid}
+     * @return {@link ResponseEntity} containing updated {@link UserDto}, wrapped in
+     *         HTTP status 200 (OK).
+     */
     @Operation(summary = "Edit user")
     @PutMapping("/edit")
     public ResponseEntity<UserDto> editUser(@Valid @RequestBody UserDto userDto) {
@@ -43,6 +69,13 @@ public class UserRestController {
         return new ResponseEntity<UserDto>(updatedUser, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves a user by their ID
+     * 
+     * @param id the ID of the user to retrieve
+     * @return {@link ResponseEntity} containing found {@link UserDto}, wrapped in
+     *         HTTP status 200 (OK).
+     */
     @Operation(summary = "Get user by id")
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
@@ -50,6 +83,13 @@ public class UserRestController {
         return new ResponseEntity<UserDto>(foundUser, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves user by their email
+     * 
+     * @param email the email of the user to retrieve
+     * @return {@link ResponseEntity} containing found {@link UserDto}, wrapped in
+     *         HTTP status 200 (OK).
+     */
     @Operation(summary = "Get user by email")
     @GetMapping("/email")
     public ResponseEntity<UserDto> getUserByEmail(@RequestParam String email) {
@@ -57,6 +97,12 @@ public class UserRestController {
         return new ResponseEntity<UserDto>(foundUser, HttpStatus.OK);
     }
 
+    /**
+     * Deletes user by their ID
+     * 
+     * @param id the ID of the user to be deleted
+     * @return {@link ResponseEntity} wrapped in HTTP status 204 (No content).
+     */
     @Operation(summary = "Delete user by id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -65,6 +111,15 @@ public class UserRestController {
 
     }
 
+    /**
+     * Changes password of the user
+     * 
+     * @param userDto     the user data validated by {@link Valid}
+     * @param oldPassword current user's password
+     * @param newPassword new user's password
+     * @return {@link ResponseEntity} containing updated {@link UserDto}, wrapped in
+     *         HTTP status 200 (OK).
+     */
     @Operation(summary = "Change password")
     @PutMapping("/change-password")
     public ResponseEntity<UserDto> changePassword(@Valid @RequestBody UserDto userDto,
